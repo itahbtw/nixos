@@ -8,12 +8,28 @@ _: {
         unzip
         p7zip
         unrar
-        ouch
+        libarchive # bsdtar
+        gzip
+        xz
+        bzip2
+        zstd
+        lz4
       ];
       plugins = {
-        compress = pkgs.yaziPlugins.compress.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [ ./yazi-compress.patch ];
-        });
+        # Upstream `main` (80e5268) — 0.6 tag still uses removed `fs.unique_name`
+        # and old `u.parent` API; breaks on Yazi 26.x (see KKV9/compress.yazi#37/#39).
+        compress = pkgs.stdenvNoCC.mkDerivation {
+          pname = "compress.yazi";
+          version = "0.6-main-80e5268";
+          src = pkgs.fetchurl {
+            url = "https://github.com/KKV9/compress.yazi/archive/80e5268ec74c7ac17d4d739e13a9958cba4c70d3.tar.gz";
+            hash = "sha256-ZdVXEhJpWdwXzBwFSgOse+uMe27n74xocky/UYfYTMY=";
+          };
+          installPhase = ''
+            mkdir -p $out
+            tar -xzf $src -C $out --strip-components=1
+          '';
+        };
       };
       keymap = {
         mgr.prepend_keymap = [

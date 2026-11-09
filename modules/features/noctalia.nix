@@ -18,6 +18,8 @@ _: {
           font_scale = 1.1;
           background_opacity = 1.0;
           compositor_blur = true;
+          shadow = false;
+          contact_shadow = false;
           start = [
             "workspaces"
             "sep"
@@ -132,7 +134,13 @@ _: {
           "avivbintangaringga/nix-monitor"
         ];
 
-        shell.font_family = "JetBrainsMono Nerd Font";
+        shell = {
+          font_family = "JetBrainsMono Nerd Font";
+          popup_shadows = false;
+        };
+        shell.panel.shadow = false;
+        dock.shadow = false;
+        dock.icon_shadow = false;
 
         theme = {
           mode = "dark";

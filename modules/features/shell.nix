@@ -1,6 +1,12 @@
 _: {
   flake.modules.homeManager.shell =
-    { pkgs, lib, config, ... }:    let
+    {
+      pkgs,
+      lib,
+      config,
+      ...
+    }:
+    let
       aliases = {
         nrs = "nh os switch ~/Nixos";
         nrb = "nh os boot ~/Nixos";
@@ -107,8 +113,6 @@ _: {
           '';
         };
       };
-
-
 
       # Starship config must be a real, writable file (not a Nix store symlink)
       # so Noctalia's starship template can inject the live `noctalia` palette.

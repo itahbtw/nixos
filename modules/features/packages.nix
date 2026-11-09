@@ -27,7 +27,6 @@ _: {
       python3
       jq
       opencode
-      codex
 
       # CLI utilities
       ffmpeg
@@ -65,7 +64,6 @@ _: {
       zotero
       imv
       mpv
-      brave-origin
     ];
 
     # OBS: use the NixOS module so plugins (wlrobs for wlroots capture) are

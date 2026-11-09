@@ -35,7 +35,10 @@ files = ["noctalia.toml"]
 [appearance]
 prefer_no_csd = true
 border_width = 2
-corner_radius = 16
+corner_radius = 0
+
+[appearance.shadow]
+enabled = false
 
 [appearance.blur]
 enabled = true
@@ -339,6 +342,7 @@ size = 24
 # Layout
 
 [layout]
+gap = 0
 extent_presets = [0.333, 0.5, 0.667]
 
 [layout.scrolling]
