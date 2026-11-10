@@ -145,7 +145,39 @@ _: {
         theme = {
           mode = "dark";
           source = "builtin";
-          builtin = "Catppuccin";
+          builtin = "Gruvbox";
+
+          templates = {
+            enable_builtin_templates = true;
+            enable_community_templates = true;
+            builtin_ids = [
+              "btop"
+              "gtk3"
+              "gtk4"
+              "kitty"
+              "umbriel"
+            ];
+            community_ids = [
+              "opencode"
+              "lazyvim"
+              "libreoffice"
+              "neovim"
+              "vscode"
+              "fastfetch"
+              "obs"
+              "zathura"
+              "bat"
+              "fzf"
+              "lazygit"
+              "yazi"
+            ];
+
+            user.starship = {
+              input_path = "${../noctalia/starship-palette.toml}";
+              output_path = "$XDG_CACHE_HOME/noctalia/starship-palette.toml";
+              post_hook = "bash ${../noctalia/starship-palette.sh}";
+            };
+          };
         };
       };
     };

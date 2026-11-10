@@ -342,7 +342,7 @@ size = 24
 # Layout
 
 [layout]
-gap = 0
+gap = 8
 extent_presets = [0.333, 0.5, 0.667]
 
 [layout.scrolling]
@@ -372,6 +372,11 @@ match.title = "^(Picture-in-Picture|Picture in picture)$"
 default_floating = true
 default_maximize = false
 default_position = { x = 20, y = 20, anchor = "bottom_right" }
+
+# Helium: open every window at the browsing width instead of the 0.5 default.
+[[window_rule]]
+match.app_id = "^helium$"
+default_scrolling_extent = 0.667
 
 # Mirror window: place wl-mirror on the TV output and make it fullscreen.
 [[window_rule]]

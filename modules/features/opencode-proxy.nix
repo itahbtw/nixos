@@ -10,9 +10,22 @@
     let
       proxyConfig = "/opt/opencode-unlimited-proxy/stack/config.json";
       apiKeyFile = "${config.xdg.configHome}/opencode/proxy-api-key";
-    in
-    {
-      xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
+      syncScript = ../../scripts/opencode-proxy-sync.py;
+      fallbackModels = [
+        "beam-free"
+        "big-pickle"
+        "deepseek-v4.1-flash-free"
+        "flint-40b-free"
+        "glm-5.3-flash-free"
+        "iceman-free"
+        "inkling-2-small-free"
+        "longcat-2.5-free"
+        "mimo-v2.6-flash-free"
+        "minimax-m3.1-flash-free"
+        "nemotron-3.5-lightning-free"
+        "nemotron-3.5-super-vl-free"
+      ];
+      baseConfig = {
         "$schema" = "https://opencode.ai/config.json";
         provider.opencode-unlimited-proxy = {
           npm = "@ai-sdk/openai-compatible";
@@ -22,25 +35,18 @@
             apiKey = "{file:${apiKeyFile}}";
           };
           models = builtins.listToAttrs (
-            map
-              (id: {
-                name = id;
-                value = { };
-              })
-              [
-                "beam-free"
-                "big-pickle"
-                "deepseek-v4.1-flash-free"
-                "glm-5.3-flash-free"
-                "longcat-2.5-preview-free"
-                "minimax-m3.1-flash-free"
-                "mimo-v2.6-flash-free"
-                "nemotron-3.5-lightning-free"
-                "nemotron-3.5-super-vl-free"
-              ]
+            map (id: {
+              name = id;
+              value = { };
+            }) fallbackModels
           );
         };
       };
+    in
+    {
+      # The proxy's model catalog is runtime data, so keep only the static
+      # provider settings here and regenerate opencode.json on every activation.
+      xdg.configFile."opencode/opencode-proxy-base.json".text = builtins.toJSON baseConfig;
 
       home.activation.opencodeProxyApiKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         set -eu
@@ -58,6 +64,10 @@
         chmod 600 "$tmp"
         mv -f "$tmp" "$target"
         trap - EXIT
+      '';
+
+      home.activation.opencodeProxyConfig = lib.hm.dag.entryAfter [ "opencodeProxyApiKey" ] ''
+        ${pkgs.python3}/bin/python3 ${lib.escapeShellArg (toString syncScript)} || true
       '';
     };
 }

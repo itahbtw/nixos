@@ -9,5 +9,9 @@ _: {
         autostart = false;
       };
     };
+
+    # Free routed IPv6 for WARP. The interface stays dormant until
+    # scripts/setup-route64-ipv6.sh writes /etc/wireguard/route64.conf.
+    services.route64Tunnel.enable = true;
   };
 }

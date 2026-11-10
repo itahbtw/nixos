@@ -80,6 +80,9 @@ _: {
             "catppuccin-powerline"
             "nerd-font-symbols"
           ];
+          # Override the preset's hardcoded `catppuccin_mocha` selection so the
+          # prompt uses the live palette that Noctalia injects.
+          settings.palette = "noctalia";
         };
 
         git.enable = true;
@@ -125,6 +128,9 @@ _: {
           ${pkgs.coreutils}/bin/cp "$src" "$target"
           ${pkgs.coreutils}/bin/chmod u+w "$target"
         fi
+        # Home Manager rewrites the file on every rebuild, so re-inject the
+        # cached Noctalia palette; Noctalia refreshes it when the theme changes.
+        ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} || true
       '';
 
     };
