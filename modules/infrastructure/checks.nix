@@ -9,6 +9,7 @@ _: {
           deadnix
           nixd
           nixfmt
+          shellcheck
           statix
         ];
       };
@@ -41,6 +42,16 @@ _: {
             }
             ''
               find ${../..} -name '*.nix' -print0 | xargs -0 nixfmt --check
+              touch $out
+            '';
+
+        shellcheck =
+          pkgs.runCommand "shellcheck-check"
+            {
+              nativeBuildInputs = [ pkgs.shellcheck ];
+            }
+            ''
+              shellcheck ${../..}/scripts/*.sh ${../..}/modules/noctalia/*.sh
               touch $out
             '';
       };

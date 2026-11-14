@@ -19,14 +19,13 @@ _: {
           "usb_storage"
           "sd_mod"
         ];
-        initrd.kernelModules = [ ];
         kernelModules = [ "kvm-intel" ];
-        extraModulePackages = [ ];
       };
 
       fileSystems."/" = {
         device = "/dev/disk/by-uuid/16757e43-8781-43ca-98d8-af261a8861eb";
         fsType = "ext4";
+        options = [ "noatime" ];
       };
 
       fileSystems."/boot" = {

@@ -1,5 +1,7 @@
 _: {
   flake.modules.nixos.packages = { pkgs, lib, ... }: {
+    # Zotero ships its own Firefox ESR build, which nixpkgs flags as insecure.
+    # The pin tracks Zotero's bundled version; update it when eval complains.
     nixpkgs.config.permittedInsecurePackages = [
       "firefox-esr-140-bin-unwrapped-140.17.0esr"
     ];
@@ -48,6 +50,9 @@ _: {
       # GUI applications
       proton-authenticator
       proton-vpn
+      # SDPR causes tdf#168910 (white lines across images while scrolling) and
+      # tdf#164476 (invisible sidebar controls). 26.8.2 fixes the former, so
+      # only disable it on affected releases; newer builds run the normal path.
       (
         if lib.versionOlder libreoffice.version "26.8.2" then
           libreoffice.override {

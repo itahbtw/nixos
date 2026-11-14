@@ -7,15 +7,17 @@ _: {
       ...
     }:
     {
-      # nginx runs as the unprivileged `nginx` user, so it needs to be able to
-      # traverse the home directory to serve files from ~/Projects. Group and
-      # other users still cannot list or read the home directory itself.
-      users.users.itah.homeMode = "0711";
-
-      # Both units ship with ProtectHome=yes, which hides /home entirely.
-      # This local development server intentionally serves files from ~/Projects.
-      systemd.services.nginx.serviceConfig.ProtectHome = lib.mkForce false;
-      systemd.services.phpfpm-web.serviceConfig.ProtectHome = lib.mkForce false;
+      # Keep /home private. Both units get a private /home with only
+      # ~/Projects bind-mounted: nginx read-only, PHP read-write. This avoids
+      # exposing the whole home directory just to serve one folder.
+      systemd.services.nginx.serviceConfig = {
+        ProtectHome = lib.mkForce "tmpfs";
+        BindReadOnlyPaths = [ "/home/itah/Projects" ];
+      };
+      systemd.services.phpfpm-web.serviceConfig = {
+        ProtectHome = lib.mkForce "tmpfs";
+        BindPaths = [ "/home/itah/Projects" ];
+      };
 
       services.nginx = {
         enable = true;

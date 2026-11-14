@@ -161,6 +161,9 @@ size = 24
 # ==============================================================================
 # Session
 
+# Wake up happens automatically on any input after dpms-off.
+"Mod+Ctrl+O" = { action = "dpms-off", repeat = false }
+
 "Mod+Ctrl+Shift+L" = { action = "spawn noctalia msg session lock", repeat = false }
 "Mod+Escape" = { action = "session-quit", repeat = false }
 "Mod+Q" = { action = "window-close", repeat = false }

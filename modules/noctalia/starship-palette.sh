@@ -33,6 +33,8 @@ fi
 
 # Re-insert the palette selection after "$schema" when present.
 {
+    # $schema is a literal JSON key, not a shell variable.
+    # shellcheck disable=SC2016
     if grep -qE '^"\$schema"' "$body_file"; then
         awk '
             /^"\$schema"/ {
@@ -55,7 +57,8 @@ fi
     echo "$marker_end"
 } >"$tmp_file"
 
-# Write through a symlink instead of replacing it, and only on change.
+# Replace the file atomically, only when the contents changed. If the path is
+# a store symlink, this replaces the link with a writable regular file.
 if [ ! -f "$config_file" ] || ! cmp -s "$config_file" "$tmp_file"; then
-    cat "$tmp_file" >"$config_file"
+    mv -f "$tmp_file" "$config_file"
 fi

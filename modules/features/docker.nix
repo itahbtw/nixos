@@ -3,7 +3,12 @@ _: {
     virtualisation.docker = {
       enable = true;
       enableOnBoot = true;
-      extraPackages = [ pkgs.docker-compose ];
+      # Weekly prune of stopped containers, dangling images, and build cache.
+      # Tagged images are kept (`--all` is intentionally not passed).
+      autoPrune = {
+        enable = true;
+        dates = "weekly";
+      };
     };
 
     # The WARP containers need a TUN device.

@@ -31,7 +31,6 @@ _: {
 
         lg = "lazygit";
         df = "duf";
-        tldr = "tealdeer";
         ntree = "nix-tree";
         nlint = "statix check .";
         ndead = "deadnix .";
@@ -46,28 +45,47 @@ _: {
       };
     in
     {
-      home.shellAliases = aliases;
+      home = {
+        shellAliases = aliases;
 
-      # A single shell-agnostic helper instead of duplicating the function in
-      # bash and fish.
-      home.packages = [
-        (pkgs.writeShellApplication {
-          name = "ncfg";
-          runtimeInputs = with pkgs; [
-            bat
-            fd
-            fzf
-            neovim
-          ];
-          text = ''
-            file=$(fd --type f --hidden --exclude .git . "$HOME/Nixos" \
-              | fzf --preview 'bat --style=plain --color=always {}' --preview-window=right:60%)
-            if [ -n "$file" ]; then
-              exec nvim "$file"
-            fi
-          '';
-        })
-      ];
+        # A single shell-agnostic helper instead of duplicating the function in
+        # bash and fish.
+        packages = [
+          (pkgs.writeShellApplication {
+            name = "ncfg";
+            runtimeInputs = with pkgs; [
+              bat
+              fd
+              fzf
+              neovim
+            ];
+            text = ''
+              file=$(fd --type f --hidden --exclude .git . "$HOME/Nixos" \
+                | fzf --preview 'bat --style=plain --color=always {}' --preview-window=right:60%)
+              if [ -n "$file" ]; then
+                exec nvim "$file"
+              fi
+            '';
+          })
+        ];
+
+        # Starship config must be a real, writable file (not a Nix store symlink)
+        # so Noctalia's starship template can inject the live `noctalia` palette.
+        activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          set -eu
+          target="${config.xdg.configHome}/starship.toml"
+          if [ -L "$target" ]; then
+            src="$(${pkgs.coreutils}/bin/readlink -f "$target")"
+            tmp="$target.hm-tmp"
+            ${pkgs.coreutils}/bin/cp "$src" "$tmp"
+            ${pkgs.coreutils}/bin/chmod u+w "$tmp"
+            ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
+          fi
+          # Home Manager rewrites the file on every rebuild, so re-inject the
+          # cached Noctalia palette; Noctalia refreshes it when the theme changes.
+          ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} || true
+        '';
+      };
 
       programs = {
         zoxide.enable = true;
@@ -85,7 +103,16 @@ _: {
           settings.palette = "noctalia";
         };
 
-        git.enable = true;
+        git = {
+          enable = true;
+          settings.user = {
+            name = "itah";
+            email = "103980435+itahbtw@users.noreply.github.com";
+          };
+          # Use the already-authenticated `gh` CLI for HTTPS pushes instead of
+          # prompting for a username. The generated XDG config is read-only.
+          settings.credential."https://github.com".helper = "!${pkgs.gh}/bin/gh auth git-credential";
+        };
 
         direnv = {
           enable = true;
@@ -116,22 +143,6 @@ _: {
           '';
         };
       };
-
-      # Starship config must be a real, writable file (not a Nix store symlink)
-      # so Noctalia's starship template can inject the live `noctalia` palette.
-      home.activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        set -eu
-        target="${config.xdg.configHome}/starship.toml"
-        if [ -L "$target" ]; then
-          src="$(${pkgs.coreutils}/bin/readlink -f "$target")"
-          ${pkgs.coreutils}/bin/rm -f "$target"
-          ${pkgs.coreutils}/bin/cp "$src" "$target"
-          ${pkgs.coreutils}/bin/chmod u+w "$target"
-        fi
-        # Home Manager rewrites the file on every rebuild, so re-inject the
-        # cached Noctalia palette; Noctalia refreshes it when the theme changes.
-        ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} || true
-      '';
 
     };
 }

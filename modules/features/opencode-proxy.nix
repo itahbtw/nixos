@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.modules.homeManager.opencodeProxy =
     {
       config,
@@ -48,19 +47,24 @@
       # provider settings here and regenerate opencode.json on every activation.
       xdg.configFile."opencode/opencode-proxy-base.json".text = builtins.toJSON baseConfig;
 
+      # The proxy is optional: a missing checkout must not break every Home
+      # Manager activation. Leave any existing key in place and warn instead.
       home.activation.opencodeProxyApiKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         set -eu
-        source="${proxyConfig}"
+        proxy_config="${proxyConfig}"
         target="${apiKeyFile}"
-        if [ ! -r "$source" ]; then
-          echo "OpenCode proxy config is missing or unreadable: $source" >&2
-          exit 1
+        if [ ! -r "$proxy_config" ]; then
+          echo "OpenCode proxy config missing ($proxy_config); skipping key sync." >&2
+          exit 0
         fi
 
         install -d -m 700 "$(dirname "$target")"
         tmp="$target.tmp"
         trap 'rm -f "$tmp"' EXIT
-        ${pkgs.jq}/bin/jq -er '.server_keys[0] | select(type == "string" and length > 0)' "$source" > "$tmp"
+        if ! ${pkgs.jq}/bin/jq -er '.server_keys[0] | select(type == "string" and length > 0)' "$proxy_config" > "$tmp"; then
+          echo "OpenCode proxy config has no usable server key; skipping." >&2
+          exit 0
+        fi
         chmod 600 "$tmp"
         mv -f "$tmp" "$target"
         trap - EXIT

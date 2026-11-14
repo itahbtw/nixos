@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.modules.nixos.ipv6Tunnel =
     { config, lib, ... }:
     let
@@ -27,7 +26,7 @@
         boot.kernel.sysctl."net.ipv6.ip_nonlocal_bind" = 1;
 
         networking.wg-quick.interfaces.route64 = {
-          configFile = cfg.configFile;
+          inherit (cfg) configFile;
           autostart = true;
         };
 

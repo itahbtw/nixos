@@ -13,11 +13,10 @@ _: {
         set -eu
         target="${config.xdg.configHome}/btop/btop.conf"
         mkdir -p "$(dirname "$target")"
-        if [ -L "$target" ]; then
-          ${pkgs.coreutils}/bin/rm -f "$target"
-        fi
-        ${pkgs.coreutils}/bin/cp "${../btop/btop.conf}" "$target"
-        ${pkgs.coreutils}/bin/chmod u+w "$target"
+        tmp="$target.hm-tmp"
+        ${pkgs.coreutils}/bin/cp "${../btop/btop.conf}" "$tmp"
+        ${pkgs.coreutils}/bin/chmod u+w "$tmp"
+        ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
       '';
     };
 }

@@ -31,7 +31,6 @@ _: {
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        PermissionsStartOnly = true;
         User = "root";
         UMask = "0077";
         ExecStart = pkgs.writeShellScript "mariadb-website-password" ''
@@ -51,8 +50,12 @@ _: {
           ALTER USER 'itah'@'localhost' IDENTIFIED BY '$pw';
           CREATE USER IF NOT EXISTS 'itah'@'127.0.0.1' IDENTIFIED BY '$pw';
           ALTER USER 'itah'@'127.0.0.1' IDENTIFIED BY '$pw';
-          GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX ON website.* TO 'itah'@'localhost';
-          GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX ON website.* TO 'itah'@'127.0.0.1';
+          GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX,
+            REFERENCES, CREATE TEMPORARY TABLES, LOCK TABLES, TRIGGER,
+            CREATE VIEW, SHOW VIEW ON website.* TO 'itah'@'localhost';
+          GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX,
+            REFERENCES, CREATE TEMPORARY TABLES, LOCK TABLES, TRIGGER,
+            CREATE VIEW, SHOW VIEW ON website.* TO 'itah'@'127.0.0.1';
           FLUSH PRIVILEGES;
           SQL
         '';

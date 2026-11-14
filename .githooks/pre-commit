@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Format and lint staged Nix/shell files. Enable with:
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+nix_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.nix$' || true)
+sh_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.sh$' || true)
+
+if [ -z "$nix_files" ] && [ -z "$sh_files" ]; then
+  exit 0
+fi
+
+if [ -n "$nix_files" ]; then
+  mapfile -t files <<<"$nix_files"
+  nix develop --command nixfmt "${files[@]}"
+  if ! git diff --quiet -- "${files[@]}"; then
+    echo "nixfmt changed files; stage them and retry." >&2
+    exit 1
+  fi
+  nix develop --command statix check .
+  nix develop --command deadnix --fail "${files[@]}"
+fi
+
+if [ -n "$sh_files" ]; then
+  mapfile -t files <<<"$sh_files"
+  nix develop --command shellcheck "${files[@]}"
+fi

@@ -11,11 +11,10 @@ _: {
         set -eu
         target="${config.xdg.configHome}/umbriel/config.toml"
         mkdir -p "$(dirname "$target")"
-        if [ -L "$target" ]; then
-          ${pkgs.coreutils}/bin/rm -f "$target"
-        fi
-        ${pkgs.coreutils}/bin/cp "${../umbriel/config.toml}" "$target"
-        ${pkgs.coreutils}/bin/chmod u+w "$target"
+        tmp="$target.hm-tmp"
+        ${pkgs.coreutils}/bin/cp "${../umbriel/config.toml}" "$tmp"
+        ${pkgs.coreutils}/bin/chmod u+w "$tmp"
+        ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
       '';
     };
 }
