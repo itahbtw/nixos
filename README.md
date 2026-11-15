@@ -7,6 +7,7 @@ Dendritic NixOS + Home Manager configuration for the `nixos` host.
 ```text
 flake.nix                    flake-parts entry point
 flake.lock                   pinned inputs
+ruff.toml                    Python lint/format policy
 modules/
 ├── features/                self-registering features
 ├── hosts/nixos/             host composition + hardware
@@ -15,9 +16,11 @@ modules/
 ├── fastfetch/
 ├── gtk/
 ├── kitty/
+├── mariadb/                 init.sql bootstrap (no secrets)
+├── noctalia/                starship palette template + hook
 └── umbriel/
-scripts/                     helper scripts
-.githooks/pre-commit         format/lint staged files
+scripts/                     helper scripts (route64, opencode-proxy)
+.githooks/pre-commit         format/lint staged Nix, shell, Python
 AGENTS.md                    agent build/test/maintenance notes
 ```
 
@@ -80,7 +83,8 @@ nix develop
 ```
 
 `nix flake check` runs `statix`, `deadnix`, `nixfmt`, `shellcheck` (for
-`scripts/*.sh` and `modules/noctalia/*.sh`), and evaluates the NixOS toplevel.
+`scripts/*.sh` and `modules/noctalia/*.sh`), `ruff` (for `scripts/*.py`), and
+evaluates the NixOS toplevel.
 `nix develop` provides the same linting tools. `unknown flake output 'modules'`
 is benign.
 
@@ -112,8 +116,8 @@ For reproducibility across hosts, sops-nix or agenix would be the next step.
 
 ## Git hooks
 
-`.githooks/pre-commit` formats and lints staged Nix and shell files. Enable it
-once per clone:
+`.githooks/pre-commit` formats and lints staged Nix, shell, and Python files.
+Enable it once per clone:
 
 ```bash
 git config core.hooksPath .githooks

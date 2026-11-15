@@ -10,10 +10,16 @@ from pathlib import Path
 
 CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 OPENCODE_DIR = CONFIG_HOME / "opencode"
-BASE = Path(os.environ.get("OPENCODE_PROXY_BASE", OPENCODE_DIR / "opencode-proxy-base.json"))
+BASE = Path(
+    os.environ.get("OPENCODE_PROXY_BASE", OPENCODE_DIR / "opencode-proxy-base.json")
+)
 TARGET = Path(os.environ.get("OPENCODE_PROXY_CONFIG", OPENCODE_DIR / "opencode.json"))
-KEY_FILE = Path(os.environ.get("OPENCODE_PROXY_API_KEY_FILE", OPENCODE_DIR / "proxy-api-key"))
-MODELS_URL = os.environ.get("OPENCODE_PROXY_MODELS_URL", "http://127.0.0.1:8080/v1/models")
+KEY_FILE = Path(
+    os.environ.get("OPENCODE_PROXY_API_KEY_FILE", OPENCODE_DIR / "proxy-api-key")
+)
+MODELS_URL = os.environ.get(
+    "OPENCODE_PROXY_MODELS_URL", "http://127.0.0.1:8080/v1/models"
+)
 PROVIDER = "opencode-unlimited-proxy"
 
 
@@ -40,12 +46,12 @@ def fetch_models():
         with opener.open(request, timeout=5) as response:
             payload = json.load(response)
         return {
-            model["id"]: model
-            for model in payload.get("data", [])
-            if model.get("id")
+            model["id"]: model for model in payload.get("data", []) if model.get("id")
         }
-    except Exception as error:
-        print(f"opencode-proxy-sync: cannot fetch {MODELS_URL}: {error}", file=sys.stderr)
+    except Exception as error:  # noqa: BLE001 - any failure falls back to static models
+        print(
+            f"opencode-proxy-sync: cannot fetch {MODELS_URL}: {error}", file=sys.stderr
+        )
         return None
 
 
@@ -64,8 +70,8 @@ def model_entry(model):
         entry["tool_call"] = bool(tool_call)
 
     input_modalities = model.get("input_modalities") or metadata.get("input_modalities")
-    output_modalities = (
-        model.get("output_modalities") or metadata.get("output_modalities")
+    output_modalities = model.get("output_modalities") or metadata.get(
+        "output_modalities"
     )
     modalities = {}
     if input_modalities:

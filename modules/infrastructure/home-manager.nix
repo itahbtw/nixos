@@ -16,7 +16,7 @@ in
         home = {
           stateVersion = osConfig.system.stateVersion;
           username = "itah";
-          homeDirectory = "/home/itah";
+          homeDirectory = osConfig.users.users.itah.home;
         };
 
         programs.home-manager.enable = true;

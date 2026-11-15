@@ -9,6 +9,7 @@ _: {
           deadnix
           nixd
           nixfmt
+          ruff
           shellcheck
           statix
         ];
@@ -52,6 +53,17 @@ _: {
             }
             ''
               shellcheck ${../..}/scripts/*.sh ${../..}/modules/noctalia/*.sh
+              touch $out
+            '';
+
+        ruff =
+          pkgs.runCommand "ruff-check"
+            {
+              nativeBuildInputs = [ pkgs.ruff ];
+            }
+            ''
+              ruff check --no-cache ${../..}/scripts
+              ruff format --check --no-cache ${../..}/scripts
               touch $out
             '';
       };

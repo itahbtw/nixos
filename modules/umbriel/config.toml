@@ -92,7 +92,7 @@ size = 24
 "Mod+Return" = { action = "spawn kitty", repeat = false }
 "Mod+S" = { action = "spawn noctalia msg panel-toggle control-center", repeat = false }
 "Mod+Shift+S" = { action = "spawn noctalia msg settings-toggle", repeat = false }
-"Mod+Shift+XF86Assistant" = { action = "spawn kitty -e opencode /home/itah/Projects", repeat = false }
+"Mod+Shift+XF86Assistant" = { action = "spawn kitty -e opencode @HOME@/Projects", repeat = false }
 "Mod+Slash" = { action = "cheatsheet-toggle", repeat = false }
 
 # Reload config.toml live while tuning; commit and run nrs to persist.

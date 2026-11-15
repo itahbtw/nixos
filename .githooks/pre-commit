@@ -7,8 +7,9 @@ cd "$(git rev-parse --show-toplevel)"
 
 nix_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.nix$' || true)
 sh_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.sh$' || true)
+py_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
 
-if [ -z "$nix_files" ] && [ -z "$sh_files" ]; then
+if [ -z "$nix_files" ] && [ -z "$sh_files" ] && [ -z "$py_files" ]; then
   exit 0
 fi
 
@@ -26,4 +27,10 @@ fi
 if [ -n "$sh_files" ]; then
   mapfile -t files <<<"$sh_files"
   nix develop --command shellcheck "${files[@]}"
+fi
+
+if [ -n "$py_files" ]; then
+  mapfile -t files <<<"$py_files"
+  nix develop --command ruff check "${files[@]}"
+  nix develop --command ruff format --check "${files[@]}"
 fi

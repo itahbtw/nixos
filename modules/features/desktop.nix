@@ -96,5 +96,20 @@ _: {
 
       # Compressed in-RAM swap for better responsiveness on the laptop.
       zramSwap.enable = true;
+
+      # zram (priority 5) is used before the disk swap partition (-1). Bias the
+      # kernel toward the fast compressed device instead of the SSD.
+      boot.kernel.sysctl."vm.swappiness" = 100;
+
+      # The NPU module enables this implicitly; keep it explicit so disabling
+      # the NPU cannot silently remove the GPU stack. Intel Arc (Arrow Lake)
+      # needs iHD for VA-API decode and oneVPL for QSV encode (OBS/ffmpeg).
+      hardware.graphics = {
+        enable = true;
+        extraPackages = with pkgs; [
+          intel-media-driver
+          vpl-gpu-rt
+        ];
+      };
     };
 }

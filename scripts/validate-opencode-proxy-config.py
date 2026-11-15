@@ -65,7 +65,9 @@ def main():
     listen = config.get("listen", "")
     host = listen.rsplit(":", 1)[0].strip("[]")
     if config.get("anonymous") and host not in LOOPBACK_HOSTS:
-        errors.append(f"anonymous gateway listens on {listen!r}, which is not loopback.")
+        errors.append(
+            f"anonymous gateway listens on {listen!r}, which is not loopback."
+        )
 
     for message in warnings:
         print(f"warning: {message}", file=sys.stderr)

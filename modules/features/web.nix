@@ -6,17 +6,20 @@ _: {
       pkgs,
       ...
     }:
+    let
+      projectRoot = "${config.users.users.itah.home}/Projects";
+    in
     {
       # Keep /home private. Both units get a private /home with only
       # ~/Projects bind-mounted: nginx read-only, PHP read-write. This avoids
       # exposing the whole home directory just to serve one folder.
       systemd.services.nginx.serviceConfig = {
         ProtectHome = lib.mkForce "tmpfs";
-        BindReadOnlyPaths = [ "/home/itah/Projects" ];
+        BindReadOnlyPaths = [ projectRoot ];
       };
       systemd.services.phpfpm-web.serviceConfig = {
         ProtectHome = lib.mkForce "tmpfs";
-        BindPaths = [ "/home/itah/Projects" ];
+        BindPaths = [ projectRoot ];
       };
 
       services.nginx = {
@@ -37,7 +40,7 @@ _: {
             }
           ];
 
-          root = "/home/itah/Projects";
+          root = projectRoot;
 
           locations."/" = {
             index = "index.php index.html";
