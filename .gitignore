@@ -5,3 +5,6 @@
 
 # OpenCode local state
 .opencode/
+
+# sops migration backup
+/.sops.yaml.bak

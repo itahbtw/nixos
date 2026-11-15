@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.fprintd = _: {
+  flake.modules.nixos.hostFact-nixos-fprintd = _: {
     services.fprintd.enable = true;
 
     # greetd authenticates by `substack login`, so login's PAM stack (and its

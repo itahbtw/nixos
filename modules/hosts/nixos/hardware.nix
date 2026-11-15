@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.hardware =
+  flake.modules.nixos.hostFact-nixos-hardware =
     {
       config,
       lib,

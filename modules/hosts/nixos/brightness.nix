@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.brightness = { pkgs, ... }: {
+  flake.modules.nixos.hostFact-nixos-brightness = { pkgs, ... }: {
     environment.systemPackages = [
       (pkgs.writeShellScriptBin "brightness-adaptive" ''
         set -euo pipefail

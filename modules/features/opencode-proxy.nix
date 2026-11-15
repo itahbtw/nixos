@@ -1,5 +1,5 @@
 _: {
-  flake.modules.homeManager.opencodeProxy =
+  flake.modules.homeManager.opencode-proxy =
     {
       config,
       lib,

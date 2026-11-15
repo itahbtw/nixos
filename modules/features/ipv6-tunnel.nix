@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.ipv6Tunnel =
+  flake.modules.nixos.ipv6-tunnel =
     { config, lib, ... }:
     let
       cfg = config.services.route64Tunnel;

@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.user = { pkgs, ... }: {
+  flake.modules.nixos.hostFact-nixos-user = { pkgs, ... }: {
     programs.fish.enable = true;
 
     users.users."itah" = {

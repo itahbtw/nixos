@@ -1,12 +1,20 @@
-{ config, inputs, ... }:
+{ config, ... }:
 {
-  # Every `flake.modules.nixos.<name>` under `modules/` is composed into the
-  # host automatically. Adding a feature file is enough to enable it; the host
-  # file stays free of a central feature list.
-  flake.nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
-    modules = [
-      inputs.home-manager.nixosModules.home-manager
-    ]
-    ++ builtins.attrValues config.flake.modules.nixos;
+  # Host bundle: the only modules that know this machine's facts (disks, hostname,
+  # timezone, user). modules/infrastructure/nixos.nix turns every `host-<name>`
+  # key into a nixosConfiguration, so adding `modules/hosts/<name>/default.nix`
+  # is enough to support another host.
+  flake.modules.nixos.host-nixos = {
+    imports = [
+      config.flake.modules.nixos.hostFact-nixos-hardware
+      config.flake.modules.nixos.hostFact-nixos-boot
+      config.flake.modules.nixos.hostFact-nixos-networking
+      config.flake.modules.nixos.hostFact-nixos-locale
+      config.flake.modules.nixos.hostFact-nixos-user
+      config.flake.modules.nixos.hostFact-nixos-firmware
+      config.flake.modules.nixos.hostFact-nixos-fprintd
+      config.flake.modules.nixos.hostFact-nixos-kiwiears
+      config.flake.modules.nixos.hostFact-nixos-brightness
+    ];
   };
 }

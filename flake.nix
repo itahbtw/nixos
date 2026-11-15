@@ -13,13 +13,20 @@
       url = "github:oxcl/nix-flake-helium-browser";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        (inputs.import-tree ./modules)
+        # Every .nix file under modules/ must be a flake-parts module.
+        # import-tree already skips paths containing `/_`; the filter below also
+        # skips `modules/lib/` so private helper libraries can live there.
+        (inputs.import-tree.filter (path: !(inputs.nixpkgs.lib.hasInfix "/lib/" path)) ./modules)
       ];
     };
 }

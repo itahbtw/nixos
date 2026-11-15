@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.boot = { pkgs, ... }: {
+  flake.modules.nixos.hostFact-nixos-boot = { pkgs, ... }: {
     boot = {
       loader = {
         systemd-boot.enable = true;

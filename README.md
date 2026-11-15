@@ -10,7 +10,7 @@ flake.lock                   pinned inputs
 ruff.toml                    Python lint/format policy
 modules/
 ├── features/                self-registering features
-├── hosts/nixos/             host composition + hardware
+├── hosts/nixos/             host bundle + machine facts
 ├── infrastructure/          flake plumbing, Home Manager base, checks
 ├── btop/                    raw app config files
 ├── fastfetch/
@@ -19,15 +19,18 @@ modules/
 ├── mariadb/                 init.sql bootstrap (no secrets)
 ├── noctalia/                starship palette template + hook
 └── umbriel/
-scripts/                     helper scripts (route64, opencode-proxy)
+scripts/                     helper scripts (route64, opencode-proxy, secrets)
+secrets/                     sops-encrypted secrets (created by migration)
 .githooks/pre-commit         format/lint staged Nix, shell, Python
 AGENTS.md                    agent build/test/maintenance notes
 ```
 
 ## How features work
 
-Every `.nix` file under `modules/` is imported by `import-tree`. A feature
-registers itself instead of being added to a central list.
+Only flake-parts modules live under `modules/`. `import-tree` imports every
+`.nix` file there, except paths containing `/_` and `modules/lib/` (reserved for
+private helper libraries). A feature registers itself instead of being added to
+a central list.
 
 NixOS feature:
 
@@ -49,12 +52,31 @@ _: {
 }
 ```
 
-The host imports every `flake.modules.nixos.*` module, and the Home Manager
-base imports every `flake.modules.homeManager.*` module. Adding a new feature
-file is enough to enable it.
+Hosts are bundles as well:
+
+```nix
+# modules/hosts/nixos/default.nix
+{ config, ... }: {
+  flake.modules.nixos.host-nixos = {
+    imports = [ config.flake.modules.nixos.hostFact-nixos-hardware /* ... */ ];
+  };
+}
+```
+
+`modules/infrastructure/nixos.nix` turns every `flake.modules.nixos.host-<name>`
+bundle into `nixosConfigurations.<name>` and composes all non-host modules into
+it automatically. Machine facts (disks, hostname, timezone, user) are registered
+as `hostFact-<name>-*` and only pulled in by that host's bundle, so adding
+`modules/hosts/<name>/default.nix` is enough to support a second host.
+
+Host-agnostic features are exported as `flake.nixosModules` /
+`flake.homeManagerModules` (host facts excluded). Attribute keys sort
+alphabetically; never rely on file order for precedence — use `imports` or
+`lib.mkBefore`/`mkAfter`.
 
 Raw config files belong in `modules/<app>/` and are referenced from the
-matching feature module.
+matching feature module. Private helper code goes in root `lib/` or under any
+`_`-prefixed path, which `import-tree` ignores.
 
 ## Common commands
 
@@ -85,8 +107,9 @@ nix develop
 `nix flake check` runs `statix`, `deadnix`, `nixfmt`, `shellcheck` (for
 `scripts/*.sh` and `modules/noctalia/*.sh`), `ruff` (for `scripts/*.py`), and
 evaluates the NixOS toplevel.
-`nix develop` provides the same linting tools. `unknown flake output 'modules'`
-is benign.
+`nix develop` provides the same linting tools. The `unknown flake output
+'modules'` and `'homeManagerModules'` warnings are benign (dendritic/export
+outputs).
 
 ## Updates and maintenance
 
@@ -106,13 +129,30 @@ Review `ndiff` after a rebuild and use `nrr` to roll back if needed.
 
 ## Secrets
 
-Secrets are not stored in the repository:
+Machine secrets are encrypted with sops-nix + age and committed under
+`secrets/`; they are decrypted to `/run/secrets/` at activation:
 
-- WireGuard keys under `/etc` (root-only).
-- MariaDB root password in `/root` (root-only).
-- opencode API key in `/opt` (root-only).
+- WireGuard: `/run/secrets/wireguard-route64.conf`, `/run/secrets/wireguard-vpnbook.conf`
+- MariaDB: `/run/secrets/mariadb-website-password`
 
-For reproducibility across hosts, sops-nix or agenix would be the next step.
+Bootstrap once as root:
+
+```bash
+sudo ./scripts/migrate-secrets-to-sops.sh
+git add .sops.yaml secrets && nrs
+```
+
+The script generates `/var/lib/sops-nix/key.txt`. **Back that key up**; without
+it `secrets/` is unrecoverable. Edit a secret with:
+
+```bash
+sudo SOPS_AGE_KEY_FILE=/var/lib/sops-nix/key.txt \
+  sops --input-type binary secrets/<file>
+```
+
+The OpenCode proxy config in `/opt` is app-owned runtime state (the update
+script merges local overrides into it), so it is intentionally not managed by
+sops.
 
 ## Git hooks
 
@@ -131,6 +171,8 @@ git config core.hooksPath .githooks
   configs stay writable. Writes are atomic (temp file + `mv`), and runtime
   edits are overwritten on the next activation. Noctalia also writes theme
   files at runtime.
-- Auto-importing every module is ideal for this single-host setup. If a second
-  host is added with a different feature set, switch the host to explicit
-  per-host module lists.
+- Host bundles (`host-<name>`) import that machine's `hostFact-<name>-*` modules,
+  while all other modules are composed into every host. If a host should not
+  have a common feature, give that feature an explicit `enable` option instead
+  of maintaining a separate module list. Common features that reference
+  `users.users.itah` assume that user exists on every host.
