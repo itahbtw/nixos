@@ -29,6 +29,7 @@ _: {
       python3
       jq
       opencode
+      adminneo
 
       # CLI utilities
       ffmpeg

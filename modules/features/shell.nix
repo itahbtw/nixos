@@ -71,7 +71,10 @@ _: {
 
         # Starship config must be a real, writable file (not a Nix store symlink)
         # so Noctalia's starship template can inject the live `noctalia` palette.
-        activation.starshipConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        # Runs after linkGeneration so the injection wins over the freshly
+        # linked store file; the script needs awk/grep/sed, which Home Manager's
+        # activation PATH does not provide.
+        activation.starshipConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
           set -eu
           target="${config.xdg.configHome}/starship.toml"
           if [ -L "$target" ]; then
@@ -83,7 +86,16 @@ _: {
           fi
           # Home Manager rewrites the file on every rebuild, so re-inject the
           # cached Noctalia palette; Noctalia refreshes it when the theme changes.
-          ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} || true
+          PATH="${
+            lib.makeBinPath [
+              pkgs.coreutils
+              pkgs.gawk
+              pkgs.gnugrep
+              pkgs.gnused
+            ]
+          }:$PATH" \
+            ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} \
+            || echo "warning: starship palette injection failed" >&2
         '';
       };
 

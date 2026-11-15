@@ -85,12 +85,18 @@ size = 24
 "Alt+Tab" = "spawn noctalia msg window-switcher hold"
 "Mod" = { action = "spawn noctalia msg panel-toggle launcher", repeat = false }
 "Mod+B" = { action = "spawn firefox", repeat = false }
+"Mod+Ctrl+B" = { action = "spawn firefox --private-window", repeat = false }
+"Mod+Ctrl+G" = { action = "spawn helium --incognito", repeat = false }
 "Mod+E" = { action = "spawn kitty -e yazi", repeat = false }
+"Mod+G" = { action = "spawn helium", repeat = false }
 "Mod+Return" = { action = "spawn kitty", repeat = false }
 "Mod+S" = { action = "spawn noctalia msg panel-toggle control-center", repeat = false }
 "Mod+Shift+S" = { action = "spawn noctalia msg settings-toggle", repeat = false }
 "Mod+Shift+XF86Assistant" = { action = "spawn kitty -e opencode /home/itah/Projects", repeat = false }
 "Mod+Slash" = { action = "cheatsheet-toggle", repeat = false }
+
+# Reload config.toml live while tuning; commit and run nrs to persist.
+"Mod+Alt+R" = { action = "config-reload", repeat = false }
 
 # ==============================================================================
 # Screenshots and OCR
@@ -151,6 +157,7 @@ size = 24
 "Mod+Alt+Shift+D" = { action = "spawn noctalia msg desktop-widgets-toggle-edit", repeat = false }
 "Mod+Ctrl+C" = { action = "spawn noctalia msg caffeine-toggle", repeat = false }
 "Mod+Ctrl+D" = { action = "spawn noctalia msg dock-toggle", repeat = false }
+"Mod+Ctrl+Shift+D" = { action = "workspace-toggle-show-desktop", repeat = false }
 "Mod+Ctrl+M" = { action = "spawn noctalia msg mic-mute", allow_when_locked = true, repeat = false }
 "Mod+Ctrl+Shift+M" = { action = "spawn screen-mirror-toggle", repeat = false }
 "Mod+Ctrl+N" = { action = "spawn noctalia msg nightlight-toggle", repeat = false }
@@ -168,8 +175,8 @@ size = 24
 "Mod+Escape" = { action = "session-quit", repeat = false }
 "Mod+Q" = { action = "window-close", repeat = false }
 "Mod+Shift+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true, repeat = false }
+"Mod+Shift+Q" = { action = "window-kill", repeat = false }
 "Mod+X" = { action = "spawn noctalia msg panel-toggle session", repeat = false }
-# Mod+Shift+Q is left free for window-kill once Umbriel is newer than 2026-10-16.
 
 # ==============================================================================
 # Media and hardware keys
@@ -229,6 +236,10 @@ size = 24
 "Mod+Alt+Up" = { action = "window-focus-or-workspace-up", repeat = false }
 "Mod+Ctrl+Shift+Tab" = { action = "workspace-focus-last", repeat = false }
 
+# Cycle outputs (the TV on HDMI-A-1 when connected).
+"Mod+Alt+Tab" = { action = "output-focus-next", repeat = false }
+"Mod+Alt+Shift+Tab" = { action = "window-move-to-output-next", repeat = false }
+
 # ==============================================================================
 # Move, swap and consume
 
@@ -242,9 +253,17 @@ size = 24
 "Mod+Shift+K" = "window-move-up"
 "Mod+Shift+L" = "column-move-right"
 
+# Jump the focused column to either end of the strip.
+"Mod+Ctrl+End" = { action = "column-move-to-last", repeat = false }
+"Mod+Ctrl+Home" = { action = "column-move-to-first", repeat = false }
+
 # Swap with the previous/next window in layout order (PageUp/PageDown keysyms).
 "Mod+Next" = { action = "window-swap-next", repeat = false }
 "Mod+Prior" = { action = "window-swap-previous", repeat = false }
+
+# Reorder within a column (Mod+Next/Prior reorder columns).
+"Mod+Ctrl+Next" = { action = "window-swap-down", repeat = false }
+"Mod+Ctrl+Prior" = { action = "window-swap-up", repeat = false }
 
 # Consume when the focused window is alone in its column, expel when it is not.
 "Mod+Comma" = "window-consume-or-expel-left"
@@ -262,10 +281,24 @@ size = 24
 "Mod+Ctrl+Shift+W" = { action = "column-toggle-tab-bar", repeat = false }
 "Mod+W" = { action = "column-toggle-tabbed", repeat = false }
 
+# Direct tab jumps inside the focused tab group (Mod+W creates one).
+"Mod+Alt+1" = { action = "column-focus-tab 1", repeat = false }
+"Mod+Alt+2" = { action = "column-focus-tab 2", repeat = false }
+"Mod+Alt+3" = { action = "column-focus-tab 3", repeat = false }
+"Mod+Alt+4" = { action = "column-focus-tab 4", repeat = false }
+"Mod+Alt+5" = { action = "column-focus-tab 5", repeat = false }
+"Mod+Alt+6" = { action = "column-focus-tab 6", repeat = false }
+"Mod+Alt+7" = { action = "column-focus-tab 7", repeat = false }
+"Mod+Alt+8" = { action = "column-focus-tab 8", repeat = false }
+"Mod+Alt+9" = { action = "column-focus-tab 9", repeat = false }
+
 # ==============================================================================
 # Window state
 
 "Mod+C" = { action = "column-center", repeat = false }
+# Minimize only applies to floating windows.
+"Mod+Alt+Z" = { action = "window-minimize", repeat = false }
+"Mod+Alt+Shift+Z" = { action = "window-restore-minimized", repeat = false }
 "Mod+F" = { action = "window-toggle-maximize", repeat = false }
 "Mod+M" = { action = "window-toggle-maximize-to-edges", repeat = false }
 "Mod+O" = { action = "overview-toggle", repeat = false }
@@ -291,6 +324,8 @@ size = 24
 
 "Mod+Alt+J" = { action = "layout-master-count-increase", repeat = false }
 "Mod+Alt+K" = { action = "layout-master-count-decrease", repeat = false }
+# Dwindle only: flip the focused tile between side by side and stacked.
+"Mod+Alt+Shift+J" = { action = "layout-toggle-split", repeat = false }
 "Mod+Alt+Space" = { action = "workspace-set-layout toggle", repeat = false }
 
 # ==============================================================================
@@ -320,6 +355,10 @@ size = 24
 "Mod+BracketRight" = { action = "workspace-next", repeat = false }
 "Mod+Shift+BracketLeft" = { action = "window-move-to-workspace-previous", repeat = false }
 "Mod+Shift+BracketRight" = { action = "window-move-to-workspace-next", repeat = false }
+
+# Reorder workspaces in the bar.
+"Mod+Ctrl+Shift+Down" = { action = "workspace-move-down", repeat = false }
+"Mod+Ctrl+Shift+Up" = { action = "workspace-move-up", repeat = false }
 
 # ==============================================================================
 # Scratchpads
