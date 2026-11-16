@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import urllib.request
 from pathlib import Path
 
@@ -36,23 +37,30 @@ def provider_models(config):
 
 
 def fetch_models():
-    try:
-        key = KEY_FILE.read_text().strip()
-        request = urllib.request.Request(
-            MODELS_URL, headers={"Authorization": f"Bearer {key}"}
-        )
-        # Ignore ambient proxy settings: the endpoint is always local.
-        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-        with opener.open(request, timeout=5) as response:
-            payload = json.load(response)
-        return {
-            model["id"]: model for model in payload.get("data", []) if model.get("id")
-        }
-    except Exception as error:  # noqa: BLE001 - any failure falls back to static models
-        print(
-            f"opencode-proxy-sync: cannot fetch {MODELS_URL}: {error}", file=sys.stderr
-        )
-        return None
+    # The proxy is a Docker stack that may still be starting during Home
+    # Manager activation, so retry briefly before giving up.
+    for _attempt in range(4):
+        try:
+            key = KEY_FILE.read_text().strip()
+            request = urllib.request.Request(
+                MODELS_URL, headers={"Authorization": f"Bearer {key}"}
+            )
+            # Ignore ambient proxy settings: the endpoint is always local.
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            with opener.open(request, timeout=3) as response:
+                payload = json.load(response)
+            return {
+                model["id"]: model
+                for model in payload.get("data", [])
+                if model.get("id")
+            }
+        except Exception as error:  # noqa: BLE001 - any failure falls back to static models
+            last_error = error
+            time.sleep(2)
+    print(
+        f"opencode-proxy-sync: cannot fetch {MODELS_URL}: {last_error}", file=sys.stderr
+    )
+    return None
 
 
 def model_entry(model):
@@ -126,8 +134,15 @@ def main():
         )
         return 0
 
-    previous_models = provider_models(load_json(TARGET) or {})
+    current_target = load_json(TARGET) or {}
+    previous_models = provider_models(current_target)
     models = fetch_models()
+
+    if models is None and previous_models:
+        # A transient proxy outage (e.g. Home Manager activation before Docker
+        # is up) must not replace live metadata with the empty fallback entries
+        # from the Nix base, which would make OpenCode assume a 200k context.
+        base = current_target
 
     provider_key = "providers" if "providers" in base else "provider"
     proxy = base.setdefault(provider_key, {}).setdefault(PROVIDER, {})
