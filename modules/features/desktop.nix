@@ -29,6 +29,8 @@ _: {
       programs = {
         umbriel.enable = true;
 
+        # This module owns the Noctalia systemd service and its recommended
+        # integrations; the Home Manager module only generates config.toml.
         noctalia = {
           enable = true;
           systemd.enable = true;

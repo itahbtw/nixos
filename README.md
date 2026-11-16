@@ -113,8 +113,11 @@ outputs).
 
 ## Updates and maintenance
 
-Automatic upgrades, garbage collection, and store optimisation are disabled (no
-auto-upgrade module, no `nix.gc`, no `nix.optimise`). This host tracks
+Automatic upgrades, garbage collection, and the periodic `nix.optimise` service
+are disabled (no auto-upgrade module, no `nix.gc`, no `nix.optimise`). Files are
+still deduplicated as they enter the store via
+`nix.settings.auto-optimise-store = true` in `modules/features/nix.nix`; set it
+to `false` there if you want optimisation to be fully manual. This host tracks
 `nixpkgs-unstable` and `linuxPackages_latest`, so updates are manual:
 
 ```bash

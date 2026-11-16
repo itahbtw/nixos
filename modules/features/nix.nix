@@ -7,6 +7,9 @@ _: {
         "nix-command"
         "flakes"
       ];
+      # Deduplicate files as they enter the store. This is distinct from the
+      # periodic nix.optimise service (intentionally off, see maintenance.nix)
+      # and from nix.gc; leave it on unless you want fully manual optimisation.
       auto-optimise-store = true;
     };
 

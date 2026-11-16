@@ -36,7 +36,9 @@ nix flake check --no-build
 
 ## Maintenance is manual
 
-Automatic upgrades, `nix.gc`, and `nix.optimise` are intentionally disabled.
+Automatic upgrades, `nix.gc`, and the periodic `nix.optimise` service are
+intentionally disabled. `nix.settings.auto-optimise-store = true`
+(`modules/features/nix.nix`) still deduplicates files as they enter the store.
 Run when needed:
 
 ```bash
@@ -49,11 +51,25 @@ ngc                          # nh clean all --optimise
 
 ## Secrets
 
-Not stored in the repo:
+Machine secrets are sops-nix + age encrypted and committed under `secrets/`,
+decrypted to `/run/secrets/` at activation:
 
-- WireGuard keys under `/etc` (root-only).
-- MariaDB root password in `/root` (root-only).
-- opencode API key in `/opt` (root-only).
+- `wireguard-route64.conf` → `/run/secrets/wireguard-route64.conf`
+- `wireguard-vpnbook.conf` → `/run/secrets/wireguard-vpnbook.conf`
+- `mariadb-website-password` → `/run/secrets/mariadb-website-password`
+
+The age key is `/var/lib/sops-nix/key.txt`. Back it up — without it `secrets/`
+is unrecoverable. `modules/features/secrets.nix` skips sops entirely when no
+encrypted file exists, so a fresh clone still evaluates. The OpenCode proxy
+config/API key under `/opt` is app-owned runtime state and is intentionally
+not managed here.
+
+Edit a secret with:
+
+```bash
+sudo SOPS_AGE_KEY_FILE=/var/lib/sops-nix/key.txt \
+  sops --input-type binary secrets/<file>
+```
 
 ## Writable configs
 
@@ -65,5 +81,5 @@ those files are overwritten on the next `home-manager` activation.
 
 - Keep `nixpkgs-unstable` and `linuxPackages_latest`; do not downgrade them.
 - Keep the LibreOffice SDPR override gated on `< 26.8.2` (tdf#168910).
-- Do not commit `flake.lock` changes unless asked.
+- Commit `flake.lock` after a successful `nfu` + `nrs` so input updates are pinned.
 - Follow existing formatting; `nixfmt` is authoritative.

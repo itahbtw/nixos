@@ -3,7 +3,8 @@ _: {
     programs.noctalia = {
       enable = true;
       package = pkgs.noctalia;
-      systemd.enable = false;
+      # The systemd service is owned by the NixOS module (desktop.nix); Home
+      # Manager only generates config.toml from `settings` below.
       checkConfig = true;
       settings = {
         bar.default = {
