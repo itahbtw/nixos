@@ -24,12 +24,12 @@ _: {
         php85Packages.php-cs-fixer
         phpactor
 
-        # Java (JDK 21 default untuk Gradle/Kotlin/Android; JDK 25 untuk jdtls)
+        # Java: JDK 21 is the default for Gradle/Kotlin/Android; JDK 25 is for jdtls.
         jdk
         jdk25
         gradle
 
-        # (Maven & jdt-language-server dihapus: Gradle + Mason jdtls sudah cukup)
+        # Maven and jdt-language-server are omitted: Gradle + Mason's jdtls suffice.
 
         # Android
         android-tools
@@ -61,7 +61,7 @@ _: {
 
     programs.nix-ld.enable = true;
 
-    # Library FHS untuk Android SDK emulator (X11/GL/audio/QEMU).
+    # FHS libraries for the Android SDK emulator (X11/GL/audio/QEMU).
     programs.nix-ld.libraries = with pkgs; [
       libx11
       libxext

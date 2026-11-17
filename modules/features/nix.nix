@@ -15,7 +15,11 @@ _: {
 
     # The system tracks nixpkgs-unstable on purpose; updates are manual.
     environment = {
+      # Suppress verbose xkbcommon warnings; the X11 keymap is configured
+      # explicitly in hosts/nixos/locale.nix.
       sessionVariables.XKB_LOG_LEVEL = "error";
+      # System-wide editor defaults; neovim stays in environment.systemPackages
+      # (packages.nix) because EDITOR/VISUAL point to it.
       variables = {
         EDITOR = "nvim";
         VISUAL = "nvim";

@@ -83,3 +83,5 @@ those files are overwritten on the next `home-manager` activation.
 - Keep the LibreOffice SDPR override gated on `< 26.8.2` (tdf#168910).
 - Commit `flake.lock` after a successful `nfu` + `nrs` so input updates are pinned.
 - Follow existing formatting; `nixfmt` is authoritative.
+- Prefer native module options; use `xdg.configFile` symlinks for static configs
+  and `lib/mkWritableConfig.nix` only for runtime-mutable ones.

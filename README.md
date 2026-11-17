@@ -78,6 +78,16 @@ Raw config files belong in `modules/<app>/` and are referenced from the
 matching feature module. Private helper code goes in root `lib/` or under any
 `_`-prefixed path, which `import-tree` ignores.
 
+### Choosing a config mechanism
+
+Prefer the native NixOS/Home Manager module option when one exists (for example
+`programs.noctalia.settings` or `programs.yazi`). For static configs with no
+native option, use a read-only `xdg.configFile` symlink (GTK, zathura). Only when
+an app rewrites its own config at runtime use a writable activation copy via
+`lib/mkWritableConfig.nix` (btop, kitty, umbriel); `fastfetch` is a special case
+that merges theme colors into its JSONC during activation. Writable copies stay
+in `modules/<app>/` and are overwritten on every activation.
+
 ## Common commands
 
 | Command | Purpose |
