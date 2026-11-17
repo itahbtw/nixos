@@ -24,12 +24,10 @@ _: {
         php85Packages.php-cs-fixer
         phpactor
 
-        # Java: JDK 21 is the default for Gradle/Kotlin/Android; JDK 25 is for jdtls.
+        # Kotlin/JVM: JDK 21 runs kotlinc, Gradle, and the Kotlin language
+        # server. There is no Java source, so no second JDK or jdtls is needed.
         jdk
-        jdk25
         gradle
-
-        # Maven and jdt-language-server are omitted: Gradle + Mason's jdtls suffice.
 
         # Android
         android-tools
@@ -53,10 +51,6 @@ _: {
         clippy
         rust-analyzer
       ];
-      variables = {
-        JDTLS_JAVA_HOME = "${pkgs.jdk25}";
-        JDK21_HOME = "${pkgs.jdk}";
-      };
     };
 
     programs.nix-ld.enable = true;
