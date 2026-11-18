@@ -11,12 +11,15 @@
   source,
   preCopy ? "",
 }:
+let
+  extra = lib.optionalString (preCopy != "") "\n${lib.trim preCopy}";
+in
 lib.hm.dag.entryAfter [ "writeBoundary" ] ''
   set -eu
   target="${config.xdg.configHome}/${name}"
   mkdir -p "$(dirname "$target")"
   tmp="$target.hm-tmp"
   ${pkgs.coreutils}/bin/cp "${source}" "$tmp"
-  ${pkgs.coreutils}/bin/chmod u+w "$tmp"${lib.optionalString (preCopy != "") "\n${lib.trim preCopy}"}
+  ${pkgs.coreutils}/bin/chmod u+w "$tmp"${extra}
   ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
 ''

@@ -6,6 +6,9 @@ _: {
       modulesPath,
       ...
     }:
+    let
+      redistributable = config.hardware.enableRedistributableFirmware;
+    in
     {
       imports = [
         (modulesPath + "/installer/scan/not-detected.nix")
@@ -43,7 +46,7 @@ _: {
 
       nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
       hardware.cpu.intel.npu.enable = true;
-      hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+      hardware.cpu.intel.updateMicrocode = lib.mkDefault redistributable;
 
       system.stateVersion = "26.11";
     };

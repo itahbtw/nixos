@@ -102,7 +102,10 @@ sudo docker compose -f "$stack/docker-compose.yml" up -d --force-recreate --remo
 echo "== Service status =="
 sudo docker compose -f "$stack/docker-compose.yml" ps
 
-api_key=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["server_keys"][0])' "$stack/config.json")
+api_key=$(python3 -c '
+import json, sys
+print(json.load(open(sys.argv[1]))["server_keys"][0])
+' "$stack/config.json")
 api_ready=0
 quota_exhausted=0
 for _ in {1..30}; do

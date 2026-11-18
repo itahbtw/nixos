@@ -61,7 +61,9 @@ _: {
         install -d -m 700 "$(dirname "$target")"
         tmp="$target.tmp"
         trap 'rm -f "$tmp"' EXIT
-        if ! ${pkgs.jq}/bin/jq -er '.server_keys[0] | select(type == "string" and length > 0)' "$proxy_config" > "$tmp"; then
+        if ! ${pkgs.jq}/bin/jq -er '
+          .server_keys[0] | select(type == "string" and length > 0)
+        ' "$proxy_config" > "$tmp"; then
           echo "OpenCode proxy config has no usable server key; skipping." >&2
           exit 0
         fi

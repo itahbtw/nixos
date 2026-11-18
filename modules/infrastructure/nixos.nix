@@ -44,9 +44,15 @@ in
     # Expose each host's toplevel as a flake check so `nix flake check`
     # evaluates (and optionally builds) the full system.
     checks = lib.mkMerge (
-      lib.mapAttrsToList (name: nixos: {
-        ${nixos.config.nixpkgs.hostPlatform.system}."nixos-${name}" = nixos.config.system.build.toplevel;
-      }) hostConfigurations
+      lib.mapAttrsToList (
+        name: nixos:
+        let
+          system = nixos.config.nixpkgs.hostPlatform.system;
+        in
+        {
+          ${system}."nixos-${name}" = nixos.config.system.build.toplevel;
+        }
+      ) hostConfigurations
     );
   };
 }

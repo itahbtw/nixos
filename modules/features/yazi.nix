@@ -22,7 +22,9 @@ _: {
           pname = "compress.yazi";
           version = "0.6-main-80e5268";
           src = pkgs.fetchurl {
-            url = "https://github.com/KKV9/compress.yazi/archive/80e5268ec74c7ac17d4d739e13a9958cba4c70d3.tar.gz";
+            url =
+              "https://github.com/KKV9/compress.yazi/archive/"
+              + "80e5268ec74c7ac17d4d739e13a9958cba4c70d3.tar.gz";
             hash = "sha256-ZdVXEhJpWdwXzBwFSgOse+uMe27n74xocky/UYfYTMY=";
           };
           installPhase = ''

@@ -30,8 +30,14 @@ _: {
         tmp="$(${pkgs.coreutils}/bin/mktemp "$target".tmp.XXXXXX)"
         if [ ! -f "$target" ]; then
           ${pkgs.coreutils}/bin/cp "$store_config" "$tmp"
-        elif ${pkgs.jq}/bin/jq -e . "$store_config" >/dev/null 2>&1 && ${pkgs.jq}/bin/jq -e . "$target" >/dev/null 2>&1; then
-          ${pkgs.jq}/bin/jq -s '.[0] * {logo: (.[1].logo // .[0].logo), display: (.[1].display // .[0].display)}' "$store_config" "$target" > "$tmp"
+        elif ${pkgs.jq}/bin/jq -e . "$store_config" >/dev/null 2>&1 \
+          && ${pkgs.jq}/bin/jq -e . "$target" >/dev/null 2>&1; then
+          ${pkgs.jq}/bin/jq -s '
+            .[0] * {
+              logo: (.[1].logo // .[0].logo),
+              display: (.[1].display // .[0].display)
+            }
+          ' "$store_config" "$target" > "$tmp"
         else
           ${pkgs.coreutils}/bin/cp "$store_config" "$tmp"
         fi

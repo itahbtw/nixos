@@ -7,6 +7,7 @@ _: {
       ...
     }:
     let
+      ghCredentialHelper = "!${pkgs.gh}/bin/gh auth git-credential";
       aliases = {
         nrs = "nh os switch ~/Nixos";
         nrb = "nh os boot ~/Nixos";
@@ -123,7 +124,7 @@ _: {
           };
           # Use the already-authenticated `gh` CLI for HTTPS pushes instead of
           # prompting for a username. The generated XDG config is read-only.
-          settings.credential."https://github.com".helper = "!${pkgs.gh}/bin/gh auth git-credential";
+          settings.credential."https://github.com".helper = ghCredentialHelper;
         };
 
         direnv = {
@@ -142,8 +143,9 @@ _: {
             if [[ -f /etc/bashrc ]]; then
               . /etc/bashrc
             fi
-            if [[ -n "$KITTY_SHELL_INTEGRATION" && -f "${pkgs.kitty}/lib/kitty/shell-integration/bash/kitty.bash" ]]; then
-              . "${pkgs.kitty}/lib/kitty/shell-integration/bash/kitty.bash"
+            kitty_bash="${pkgs.kitty}/lib/kitty/shell-integration/bash/kitty.bash"
+            if [[ -n "$KITTY_SHELL_INTEGRATION" && -f "$kitty_bash" ]]; then
+              . "$kitty_bash"
             fi
           '';
         };

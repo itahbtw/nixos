@@ -21,7 +21,8 @@ _: {
             kill "$(cat "$pidfile")" 2>/dev/null || true
             rm -f "$pidfile"
             pkill -f "wl-mirror.*$source_output" 2>/dev/null || true
-            notify-send "Screen mirror" "Stopped ($source_output → $target_output)" 2>/dev/null || true
+            notify-send "Screen mirror" \
+              "Stopped ($source_output → $target_output)" 2>/dev/null || true
             exit 0
           fi
 
@@ -31,7 +32,8 @@ _: {
           wl-mirror "$source_output" >/dev/null 2>&1 &
           echo $! > "$pidfile"
 
-          notify-send "Screen mirror" "Mirroring $source_output → $target_output" 2>/dev/null || true
+          notify-send "Screen mirror" \
+            "Mirroring $source_output → $target_output" 2>/dev/null || true
         '';
       })
     ];

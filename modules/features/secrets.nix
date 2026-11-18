@@ -15,10 +15,11 @@ let
     || haveSecret "wireguard-vpnbook.conf"
     || haveSecret "mariadb-website-password";
 
-  mkSecret = name: target: {
+  # Decrypted paths mirror the encrypted filename under /run/secrets.
+  mkSecret = name: {
     sopsFile = secretFile name;
     format = "binary";
-    path = target;
+    path = "/run/secrets/${name}";
     mode = "0400";
   };
 in
@@ -42,14 +43,13 @@ in
 
         sops.secrets =
           lib.optionalAttrs (haveSecret "wireguard-route64.conf") {
-            "wireguard-route64" = mkSecret "wireguard-route64.conf" "/run/secrets/wireguard-route64.conf";
+            "wireguard-route64" = mkSecret "wireguard-route64.conf";
           }
           // lib.optionalAttrs (haveSecret "wireguard-vpnbook.conf") {
-            "wireguard-vpnbook" = mkSecret "wireguard-vpnbook.conf" "/run/secrets/wireguard-vpnbook.conf";
+            "wireguard-vpnbook" = mkSecret "wireguard-vpnbook.conf";
           }
           // lib.optionalAttrs (haveSecret "mariadb-website-password") {
-            "mariadb-website-password" =
-              mkSecret "mariadb-website-password" "/run/secrets/mariadb-website-password";
+            "mariadb-website-password" = mkSecret "mariadb-website-password";
           };
       })
 
