@@ -39,9 +39,15 @@ _: {
         # then write a strong password into that file.
         systemd.services.mariadb-website-password = {
           description = "Set MariaDB password for itah user";
-          after = [ "mysql.service" ];
-          wants = [ "mysql.service" ];
-          wantedBy = [ "multi-user.target" ];
+          after = [
+            "mysql.service"
+          ];
+          wants = [
+            "mysql.service"
+          ];
+          wantedBy = [
+            "multi-user.target"
+          ];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;

@@ -1,10 +1,22 @@
 _: {
-  flake.modules.homeManager.zathura = { pkgs, ... }: {
-    home.packages = [ pkgs.zathura ];
+  flake.modules.homeManager.zathura =
+    { pkgs, ... }:
+    {
+      home = {
+        packages = [
+          pkgs.zathura
+        ];
+      };
 
-    xdg.configFile."zathura/zathurarc".text = ''
-      set selection-clipboard clipboard
-      include ~/.config/zathura/noctaliarc
-    '';
-  };
+      xdg = {
+        configFile = {
+          "zathura/zathurarc" = {
+            text = ''
+              set selection-clipboard clipboard
+              include ~/.config/zathura/noctaliarc
+            '';
+          };
+        };
+      };
+    };
 }

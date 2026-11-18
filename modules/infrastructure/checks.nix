@@ -4,15 +4,17 @@ _: {
     {
       formatter = pkgs.nixfmt-tree;
 
-      devShells.default = pkgs.mkShell {
-        packages = with pkgs; [
-          deadnix
-          nixd
-          nixfmt
-          ruff
-          shellcheck
-          statix
-        ];
+      devShells = {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            deadnix
+            nixd
+            nixfmt
+            ruff
+            shellcheck
+            statix
+          ];
+        };
       };
 
       checks = {

@@ -9,17 +9,26 @@ in
       useUserPackages = true;
       backupFileExtension = "hm-backup";
       overwriteBackup = true;
-      users.itah = { osConfig, ... }: {
-        # Home Manager features self-register the same way NixOS features do.
-        imports = builtins.attrValues homeModules;
 
-        home = {
-          stateVersion = osConfig.system.stateVersion;
-          username = "itah";
-          homeDirectory = osConfig.users.users.itah.home;
-        };
+      users = {
+        itah =
+          { osConfig, ... }:
+          {
+            # Home Manager features self-register the same way NixOS features do.
+            imports = builtins.attrValues homeModules;
 
-        programs.home-manager.enable = true;
+            home = {
+              stateVersion = osConfig.system.stateVersion;
+              username = "itah";
+              homeDirectory = osConfig.users.users.itah.home;
+            };
+
+            programs = {
+              home-manager = {
+                enable = true;
+              };
+            };
+          };
       };
     };
   };

@@ -1,51 +1,53 @@
 # Noctalia bar / shell / theme settings. Kept in a `_`-prefixed file so
 # import-tree does not try to register it as a flake-parts module.
 {
-  bar.default = {
-    position = "top";
-    thickness = 28;
-    margin_ends = 0;
-    panel_overlap = 1;
-    radius = 0;
-    capsule = false;
-    font_family = "JetBrainsMono Nerd Font";
-    font_weight = 700;
-    font_scale = 1.1;
-    background_opacity = 1.0;
-    compositor_blur = true;
-    shadow = false;
-    contact_shadow = false;
-    start = [
-      "workspaces"
-      "sep"
-      "umbriel"
-      "sep"
-      "active_window"
-    ];
-    center = [
-      "clock"
-      "sep"
-      "weather"
-    ];
-    end = [
-      "media"
-      "sep"
-      "ram"
-      "sep"
-      "cpu"
-      "sep"
-      "temp"
-      "sep"
-      "network"
-      "sep"
-      "volume"
-      "sep"
-      "brightness"
-      "sep"
-      "bat"
-    ];
-    widget_spacing = 6;
-    padding = 8;
+  bar = {
+    default = {
+      position = "top";
+      thickness = 28;
+      margin_ends = 0;
+      panel_overlap = 1;
+      radius = 0;
+      capsule = false;
+      font_family = "JetBrainsMono Nerd Font";
+      font_weight = 700;
+      font_scale = 1.1;
+      background_opacity = 1.0;
+      compositor_blur = true;
+      shadow = false;
+      contact_shadow = false;
+      start = [
+        "workspaces"
+        "sep"
+        "umbriel"
+        "sep"
+        "active_window"
+      ];
+      center = [
+        "clock"
+        "sep"
+        "weather"
+      ];
+      end = [
+        "media"
+        "sep"
+        "ram"
+        "sep"
+        "cpu"
+        "sep"
+        "temp"
+        "sep"
+        "network"
+        "sep"
+        "volume"
+        "sep"
+        "brightness"
+        "sep"
+        "bat"
+      ];
+      widget_spacing = 6;
+      padding = 8;
+    };
   };
 
   widget = {
@@ -123,19 +125,27 @@
     };
   };
 
-  plugins.enabled = [
-    "noctalia/wallhaven"
-    "noctalia/umbriel-companion"
-    "avivbintangaringga/nix-monitor"
-  ];
+  plugins = {
+    enabled = [
+      "noctalia/wallhaven"
+      "noctalia/umbriel-companion"
+      "avivbintangaringga/nix-monitor"
+    ];
+  };
 
   shell = {
     font_family = "JetBrainsMono Nerd Font";
     popup_shadows = false;
+
+    panel = {
+      shadow = false;
+    };
   };
-  shell.panel.shadow = false;
-  dock.shadow = false;
-  dock.icon_shadow = false;
+
+  dock = {
+    shadow = false;
+    icon_shadow = false;
+  };
 
   theme = {
     mode = "dark";
@@ -167,10 +177,12 @@
         "yazi"
       ];
 
-      user.starship = {
-        input_path = "${./starship-palette.toml}";
-        output_path = "$XDG_CACHE_HOME/noctalia/starship-palette.toml";
-        post_hook = "bash ${./starship-palette.sh}";
+      user = {
+        starship = {
+          input_path = "${./starship-palette.toml}";
+          output_path = "$XDG_CACHE_HOME/noctalia/starship-palette.toml";
+          post_hook = "bash ${./starship-palette.sh}";
+        };
       };
     };
   };

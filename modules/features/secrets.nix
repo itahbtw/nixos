@@ -29,8 +29,23 @@ in
 
     config = lib.mkMerge [
       {
-        services.gnome.gnome-keyring.enable = true;
-        security.pam.services.greetd.enableGnomeKeyring = true;
+        services = {
+          gnome = {
+            gnome-keyring = {
+              enable = true;
+            };
+          };
+        };
+
+        security = {
+          pam = {
+            services = {
+              greetd = {
+                enableGnomeKeyring = true;
+              };
+            };
+          };
+        };
       }
 
       # Use optionalAttrs rather than mkIf: the `sops' option only exists when
@@ -39,30 +54,48 @@ in
         # The age key is generated once by the migration script and must be
         # backed up; without it the encrypted files in secrets/ cannot be
         # decrypted.
-        sops.age.keyFile = "/var/lib/sops-nix/key.txt";
-
-        sops.secrets =
-          lib.optionalAttrs (haveSecret "wireguard-route64.conf") {
-            "wireguard-route64" = mkSecret "wireguard-route64.conf";
-          }
-          // lib.optionalAttrs (haveSecret "wireguard-vpnbook.conf") {
-            "wireguard-vpnbook" = mkSecret "wireguard-vpnbook.conf";
-          }
-          // lib.optionalAttrs (haveSecret "mariadb-website-password") {
-            "mariadb-website-password" = mkSecret "mariadb-website-password";
+        sops = {
+          age = {
+            keyFile = "/var/lib/sops-nix/key.txt";
           };
+
+          secrets =
+            lib.optionalAttrs (haveSecret "wireguard-route64.conf") {
+              "wireguard-route64" = mkSecret "wireguard-route64.conf";
+            }
+            // lib.optionalAttrs (haveSecret "wireguard-vpnbook.conf") {
+              "wireguard-vpnbook" = mkSecret "wireguard-vpnbook.conf";
+            }
+            // lib.optionalAttrs (haveSecret "mariadb-website-password") {
+              "mariadb-website-password" = mkSecret "mariadb-website-password";
+            };
+        };
       })
 
       # Point the consumers at the decrypted copies. When a secret is absent the
       # module keeps its previous manual path.
       (lib.optionalAttrs (haveSecret "wireguard-route64.conf") {
-        services.route64Tunnel.configFile = "/run/secrets/wireguard-route64.conf";
+        services = {
+          route64Tunnel = {
+            configFile = "/run/secrets/wireguard-route64.conf";
+          };
+        };
       })
       (lib.optionalAttrs (haveSecret "wireguard-vpnbook.conf") {
-        networking.wg-quick.interfaces.vpnbook.configFile = "/run/secrets/wireguard-vpnbook.conf";
+        networking = {
+          wg-quick = {
+            interfaces = {
+              vpnbook = {
+                configFile = "/run/secrets/wireguard-vpnbook.conf";
+              };
+            };
+          };
+        };
       })
       (lib.optionalAttrs (haveSecret "mariadb-website-password") {
-        services.websiteDbPasswordFile = "/run/secrets/mariadb-website-password";
+        services = {
+          websiteDbPasswordFile = "/run/secrets/mariadb-website-password";
+        };
       })
     ];
   };

@@ -75,34 +75,42 @@ _: {
         # Runs after linkGeneration so the injection wins over the freshly
         # linked store file; the script needs awk/grep/sed, which Home Manager's
         # activation PATH does not provide.
-        activation.starshipConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-          set -eu
-          target="${config.xdg.configHome}/starship.toml"
-          if [ -L "$target" ]; then
-            src="$(${pkgs.coreutils}/bin/readlink -f "$target")"
-            tmp="$target.hm-tmp"
-            ${pkgs.coreutils}/bin/cp "$src" "$tmp"
-            ${pkgs.coreutils}/bin/chmod u+w "$tmp"
-            ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
-          fi
-          # Home Manager rewrites the file on every rebuild, so re-inject the
-          # cached Noctalia palette; Noctalia refreshes it when the theme changes.
-          PATH="${
-            lib.makeBinPath [
-              pkgs.coreutils
-              pkgs.gawk
-              pkgs.gnugrep
-              pkgs.gnused
-            ]
-          }:$PATH" \
-            ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} \
-            || echo "warning: starship palette injection failed" >&2
-        '';
+        activation = {
+          starshipConfig = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+            set -eu
+            target="${config.xdg.configHome}/starship.toml"
+            if [ -L "$target" ]; then
+              src="$(${pkgs.coreutils}/bin/readlink -f "$target")"
+              tmp="$target.hm-tmp"
+              ${pkgs.coreutils}/bin/cp "$src" "$tmp"
+              ${pkgs.coreutils}/bin/chmod u+w "$tmp"
+              ${pkgs.coreutils}/bin/mv -f "$tmp" "$target"
+            fi
+            # Home Manager rewrites the file on every rebuild, so re-inject the
+            # cached Noctalia palette; Noctalia refreshes it when the theme changes.
+            PATH="${
+              lib.makeBinPath [
+                pkgs.coreutils
+                pkgs.gawk
+                pkgs.gnugrep
+                pkgs.gnused
+              ]
+            }:$PATH" \
+              ${pkgs.bash}/bin/bash ${../noctalia/starship-palette.sh} \
+              || echo "warning: starship palette injection failed" >&2
+          '';
+        };
       };
 
       programs = {
-        zoxide.enable = true;
-        fzf.enable = true;
+        zoxide = {
+          enable = true;
+        };
+
+        fzf = {
+          enable = true;
+        };
+
         starship = {
           enable = true;
           # Catppuccin powerline uses palette names that Noctalia's starship
@@ -113,23 +121,33 @@ _: {
           ];
           # Override the preset's hardcoded `catppuccin_mocha` selection so the
           # prompt uses the live palette that Noctalia injects.
-          settings.palette = "noctalia";
+          settings = {
+            palette = "noctalia";
+          };
         };
 
         git = {
           enable = true;
-          settings.user = {
-            name = "itah";
-            email = "103980435+itahbtw@users.noreply.github.com";
+          settings = {
+            user = {
+              name = "itah";
+              email = "103980435+itahbtw@users.noreply.github.com";
+            };
+            # Use the already-authenticated `gh` CLI for HTTPS pushes instead of
+            # prompting for a username. The generated XDG config is read-only.
+            credential = {
+              "https://github.com" = {
+                helper = ghCredentialHelper;
+              };
+            };
           };
-          # Use the already-authenticated `gh` CLI for HTTPS pushes instead of
-          # prompting for a username. The generated XDG config is read-only.
-          settings.credential."https://github.com".helper = ghCredentialHelper;
         };
 
         direnv = {
           enable = true;
-          "nix-direnv".enable = true;
+          "nix-direnv" = {
+            enable = true;
+          };
         };
 
         delta = {
@@ -157,6 +175,5 @@ _: {
           '';
         };
       };
-
     };
 }

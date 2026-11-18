@@ -7,7 +7,9 @@ _: {
       ...
     }:
     {
-      home.packages = [ pkgs.kitty ];
+      home.packages = [
+        pkgs.kitty
+      ];
 
       home.activation.kittyConfig = import ../../lib/mkWritableConfig.nix {
         inherit config pkgs lib;

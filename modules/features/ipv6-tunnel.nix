@@ -30,16 +30,24 @@ _: {
           autostart = true;
         };
 
-        # Bring the tunnel up before Docker restores the proxy container, so the
-        # engine can bind its WARP sources from the routed prefix.
-        systemd.services.docker = lib.mkIf config.virtualisation.docker.enable {
-          wants = [ "wg-quick-route64.service" ];
-          after = [ "wg-quick-route64.service" ];
-        };
+        systemd = {
+          services = {
+            # Bring the tunnel up before Docker restores the proxy container, so the
+            # engine can bind its WARP sources from the routed prefix.
+            docker = lib.mkIf config.virtualisation.docker.enable {
+              wants = [
+                "wg-quick-route64.service"
+              ];
+              after = [
+                "wg-quick-route64.service"
+              ];
+            };
 
-        # Stay inactive until the tunnel has been provisioned, so an activation
-        # before the route64 account exists does not leave a failed unit.
-        systemd.services."wg-quick-route64".unitConfig.ConditionPathExists = cfg.configFile;
+            # Stay inactive until the tunnel has been provisioned, so an activation
+            # before the route64 account exists does not leave a failed unit.
+            "wg-quick-route64".unitConfig.ConditionPathExists = cfg.configFile;
+          };
+        };
       };
     };
 }

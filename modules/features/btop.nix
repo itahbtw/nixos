@@ -7,12 +7,18 @@ _: {
       ...
     }:
     {
-      home.packages = [ pkgs.btop ];
+      home = {
+        packages = [
+          pkgs.btop
+        ];
 
-      home.activation.btopConfig = import ../../lib/mkWritableConfig.nix {
-        inherit config pkgs lib;
-        name = "btop/btop.conf";
-        source = ../btop/btop.conf;
+        activation = {
+          btopConfig = import ../../lib/mkWritableConfig.nix {
+            inherit config pkgs lib;
+            name = "btop/btop.conf";
+            source = ../btop/btop.conf;
+          };
+        };
       };
     };
 }
